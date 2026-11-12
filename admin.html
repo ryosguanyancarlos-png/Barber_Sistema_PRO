@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Barbería</title>
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111827' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='6' cy='6' r='3'></circle><circle cx='6' cy='18' r='3'></circle><line x1='20' y1='4' x2='8.12' y2='15.88'></line><line x1='14.47' y1='14.48' x2='20' y2='20'></line><line x1='8.12' y1='8.12' x2='12' y2='12'></line></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-page: #f0f4f8; --card-bg: #ffffff;
+            --text-main: #111827; --text-sec: #6b7280;
+            --border-color: #e5e7eb; --accent: #111827;
+            --danger: #DC2626; --success: #25D366;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg-page); margin: 0; padding: 0; color: var(--text-main); }
+        .contenedor-admin { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid var(--border-color); }
+        h1 { font-weight: 800; font-size: 2rem; margin: 0; color: #1f2937; }
+        
+        .tabs { display: flex; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
+        .tab-btn { background: var(--card-bg); border: 1px solid var(--border-color); padding: 12px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; color: var(--text-sec); font-size: 0.95rem; }
+        .tab-btn.activa { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 4px 12px rgba(17, 24, 39, 0.2); }
+
+        .seccion { display: none; }
+        .seccion.activa { display: block; }
+
+        .admin-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;}
+        .admin-card-info { flex: 1; min-width: 250px; }
+        .admin-card-acciones { display: flex; gap: 10px; }
+        
+        h3 { margin: 0 0 5px 0; font-weight: 800; font-size: 1.2rem; }
+        p { margin: 0 0 5px 0; color: var(--text-sec); font-size: 0.95rem; }
+        .ticket-badge { background: #e0e7ff; color: #4338ca; padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; display: inline-block; margin-bottom: 8px;}
+
+        .btn { padding: 10px 15px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-size: 0.9rem; transition: 0.2s;}
+        .btn-primario { background: var(--accent); color: white; }
+        .btn-peligro { background: #fee2e2; color: var(--danger); }
+        .btn-peligro:hover { background: var(--danger); color: white; }
+        .btn-exito { background: #dcfce7; color: #166534; }
+        .btn-exito:hover { background: var(--success); color: white; }
+        .btn-submit { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 1.05rem; transition: background 0.3s;}
+
+        .form-admin { background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid var(--border-color);}
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;}
+        .form-grupo label { display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 5px; }
+        .form-grupo input, .form-grupo select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; box-sizing: border-box; font-family: 'Inter'; font-size: 1rem; background: #f9fafb; }
+        
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.75); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-box { background: var(--card-bg); padding: 30px; border-radius: 20px; width: 90%; max-width: 350px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); text-align: center;}
+    </style>
+</head>
+<body>
+
+    <!-- PANTALLA LOGIN -->
+    <div id="pantalla-login" style="height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+        <div class="form-admin" style="width: 100%; max-width: 350px; text-align: center; margin: 0;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 15px; color: #111827;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <h2 style="margin-top:0; font-weight: 800; color: #111827;">Acceso Panel</h2>
+            <p style="color: var(--text-sec); font-size: 0.9rem; margin-bottom: 20px;">Ingresa con tu correo y contraseña</p>
+            
+            <div class="form-grupo">
+                <input type="email" id="admin-email" placeholder="correo@ejemplo.com" autocomplete="username" style="margin-bottom: 12px;">
+                <input type="password" id="admin-pass" placeholder="Contraseña" autocomplete="current-password">
+            </div>
+            
+            <button class="btn-submit" onclick="verificarLogin()" style="margin-top: 5px;">Entrar</button>
+            <p id="error-login" style="color:#DC2626; font-size: 0.85rem; font-weight: 700; margin-top: 15px; display: none;">Correo o contraseña incorrectos.</p>
+        </div>
+    </div>
+
+    <!-- CONTENIDO ADMIN -->
+    <div id="contenido-admin" class="contenedor-admin" style="display: none;">
+        <header>
+            <h1>Panel de Control</h1>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <span style="background: #dcfce7; color: #166534; padding: 8px 15px; border-radius: 20px; font-weight: 700; font-size: 0.9rem;">● Activo</span>
+                <button class="btn btn-peligro" onclick="cerrarSesion()">Cerrar sesión</button>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn activa" onclick="cambiarTab('citas')">📅 Agenda</button>
+            <button class="tab-btn" onclick="cambiarTab('servicios')">✂️ Catálogo</button>
+            <button class="tab-btn" onclick="cambiarTab('dias')">🔒 Bloqueo Días</button>
+            <button class="tab-btn" onclick="cambiarTab('config')">⚙️ Configuración</button>
+        </div>
+
+        <!-- AGENDA -->
+        <div id="citas" class="seccion activa">
+            <div class="form-admin" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                <div class="form-grupo" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                    <label>Ver citas del día:</label>
+                    <input type="date" id="filtro-fecha" onchange="cargarCitas()">
+                </div>
+                <button class="btn btn-primario" onclick="cargarCitas()" style="padding: 14px 20px;">Actualizar Lista</button>
+            </div>
+            <div id="lista-citas"><p style="text-align: center; color: var(--text-sec);">Cargando citas...</p></div>
+        </div>
+
+        <!-- CATÁLOGO -->
+        <div id="servicios" class="seccion">
+            <div class="form-admin">
+                <h3 style="margin-bottom: 15px;">➕ Agregar Nuevo Servicio</h3>
+                <form id="form-nuevo-servicio">
+                    <div class="form-grid">
+                        <div class="form-grupo"><label>Nombre</label><input type="text" id="serv-nombre" required></div>
+                        <div class="form-grupo"><label>Precio (Q)</label><input type="number" id="serv-precio" required></div>
+                        <div class="form-grupo">
+                            <label>Categoría</label>
+                            <select id="serv-categoria">
+                                <option value="Clásico">Corte Clásico</option>
+                                <option value="Extra">Extra / Complemento</option>
+                            </select>
+                        </div>
+                        <div class="form-grupo"><label>Duración (Minutos)</label><input type="number" id="serv-duracion" step="15" value="30" required></div>
+                        <div class="form-grupo" style="grid-column: 1 / -1;"><label>Descripción (lo que verá el cliente)</label><textarea id="serv-descripcion" maxlength="160" rows="2" placeholder="Ej: Corte con degradado y acabado a navaja. Incluye lavado." style="width:100%;box-sizing:border-box;padding:12px;border:1px solid #d1d5db;border-radius:8px;font-family:inherit;"></textarea></div>
+                    </div>
+                    <button type="submit" class="btn btn-primario">Guardar Servicio</button>
+                </form>
+            </div>
+            <h3>Catálogo Actual</h3>
+            <div id="lista-servicios"></div>
+        </div>
+
+        <!-- DÍAS BLOQUEADOS -->
+        <div id="dias" class="seccion">
+            <div class="form-admin">
+                <h3 style="margin-bottom: 15px;">🚫 Bloquear un Día Completo</h3>
+                <form id="form-bloquear-dia" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                    <div class="form-grupo" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                        <label>Fecha a cerrar:</label>
+                        <input type="date" id="dia-cerrar" required>
+                    </div>
+                    <button type="submit" class="btn btn-peligro" style="padding: 14px 20px;">Cerrar este día</button>
+                </form>
+            </div>
+            <h3>Días Cerrados Manualmente</h3>
+            <div id="lista-dias-cerrados"></div>
+        </div>
+
+        <!-- CONFIGURACIÓN -->
+        <div id="config" class="seccion">
+            <div class="form-admin">
+                <h3 style="margin-bottom: 15px;">⚙️ Personalizar Negocio</h3>
+                <form id="form-config">
+                    <div class="form-grid">
+                        <div class="form-grupo"><label>Nombre de la Barbería</label><input type="text" id="cfg-nombre" required></div>
+                        <div class="form-grupo"><label>Slogan / Ubicación</label><input type="text" id="cfg-slogan" required></div>
+                        <div class="form-grupo"><label>WhatsApp (Ej. 502XXXXXXXX)</label><input type="text" id="cfg-wsp" required></div>
+                        <div class="form-grupo"><label>Link Instagram</label><input type="text" id="cfg-ig"></div>
+                        <div class="form-grupo"><label>Link Facebook</label><input type="text" id="cfg-fb"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primario">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DESCRIPCIÓN DEL SERVICIO -->
+    <div id="modal-descripcion" class="modal-overlay">
+        <div class="modal-box" style="max-width: 420px;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" style="margin-bottom: 12px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            <h3 style="margin: 0 0 4px; font-weight: 800; font-size: 1.15rem; color: #111827;">Descripción del servicio</h3>
+            <p id="desc-servicio-nombre" style="margin: 0 0 14px; color: #6b7280; font-size: 0.95rem;"></p>
+            <textarea id="desc-texto" maxlength="160" rows="4" placeholder="Ej: Corte con degradado y acabado a navaja. Incluye lavado." style="width:100%;box-sizing:border-box;padding:12px;border:1px solid #d1d5db;border-radius:10px;font-family:inherit;font-size:0.95rem;resize:none;"></textarea>
+            <div id="desc-contador" style="text-align:right;font-size:0.8rem;color:#9ca3af;margin:4px 0 16px;">0 / 160</div>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button onclick="cerrarDescripcion()" class="btn" style="flex:1; background: #e5e7eb; color: #374151; padding: 14px;">Cancelar</button>
+                <button onclick="guardarDescripcion()" class="btn btn-primario" style="flex:1; padding: 14px; font-size: 1rem;">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMACIÓN -->
+    <div id="modal-confirmacion" class="modal-overlay">
+        <div class="modal-box">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" style="margin-bottom: 15px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <h3 id="texto-confirmacion" style="margin-top: 0; margin-bottom: 25px; font-weight: 800; font-size: 1.15rem; color: #111827; line-height: 1.4;">¿Estás seguro?</h3>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button onclick="cerrarConfirmacion()" class="btn" style="flex:1; background: #e5e7eb; color: #374151; padding: 14px;">Cancelar</button>
+                <button onclick="ejecutarConfirmacion()" class="btn btn-peligro" style="flex:1; padding: 14px; font-size: 1rem;">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="meta-titulo">Sistema Barbería</title>
+    
+    <!-- FAVICON VECTORIAL DE BARBERÍA (TIJERA) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111827' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='6' cy='6' r='3'></circle><circle cx='6' cy='18' r='3'></circle><line x1='20' y1='4' x2='8.12' y2='15.88'></line><line x1='14.47' y1='14.48' x2='20' y2='20'></line><line x1='8.12' y1='8.12' x2='12' y2='12'></line></svg>">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-page: #f0f4f8; --card-bg: #ffffff;
+            --text-main: #111827; --text-sec: #6b7280;
+            --border-color: #e5e7eb; --accent: #111827;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg-page); margin: 0; padding: 0; color: var(--text-main); }
+        .contenedor-principal { max-width: 600px; margin: 0 auto; padding: 20px; }
+
+        .header-barberia { text-align: center; margin-bottom: 40px; padding-top: 20px; }
+        .header-barberia h1 { font-weight: 800; font-size: 2.4rem; margin: 0 0 10px 0; color: #1f2937; }
+        .header-barberia p { color: var(--text-sec); font-size: 1.05rem; margin: 0 0 20px 0; }
+        
+        .redes-sociales { display: flex; justify-content: center; gap: 15px; margin-bottom: 10px; }
+        .redes-sociales a { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: white; border-radius: 50%; color: #111827; text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.2s, background 0.2s; border: 1px solid #e5e7eb;}
+        .redes-sociales a:hover { transform: scale(1.1); background: #111827; color: white; border-color: #111827;}
+        .redes-sociales svg { width: 22px; height: 22px; fill: currentColor; }
+
+        .seccion-titulo { font-weight: 800; font-size: 1.4rem; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; color: #1f2937; }
+
+        .servicio-card { 
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; 
+            padding: 24px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+            position: relative; transition: all 0.3s ease; 
+        }
+        .servicio-card:hover { border-color: #d1d5db; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08); }
+        
+        .card-seleccionada {
+            border-color: #25D366 !important; transform: scale(1.02); 
+            box-shadow: 0 12px 20px rgba(37, 211, 102, 0.15) !important; z-index: 10;
+        }
+        
+        .check-icono {
+            position: absolute; top: 24px; right: 24px; width: 28px; height: 28px;
+            background: #25D366; border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; opacity: 0; transform: scale(0); transition: all 0.3s ease;
+        }
+        .check-icono svg { width: 16px; height: 16px; stroke: white; }
+        .card-seleccionada .check-icono { opacity: 1; transform: scale(1); }
+
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; padding-right: 35px;}
+        .card-title { font-size: 1.3rem; font-weight: 800; margin: 0; text-transform: capitalize; color: #111827;}
+        .card-price { font-size: 1.3rem; font-weight: 800; margin: 0; color: #111827;}
+        
+        .card-desc { font-size: 0.9rem; color: var(--text-sec); margin: 0 0 15px 0; line-height: 1.4; }
+
+        .badge { display: inline-block; background: #f3f4f6; color: #4b5563; font-size: 0.75rem; font-weight: 700; padding: 6px 12px; border-radius: 12px; margin-bottom: 15px; }
+        .card-duration { display: flex; align-items: center; gap: 6px; color: var(--text-sec); font-size: 0.85rem; font-weight: 600; margin-bottom: 20px; }
+
+        .btn-reservar { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem;}
+        .btn-reservar:active { transform: scale(0.98); }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.75); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-activo { display: flex !important; }
+        .modal-box { background: var(--card-bg); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
+        
+        .form-grupo { margin-bottom: 18px; }
+        .form-grupo label { display: block; font-size: 0.95rem; margin-bottom: 8px; font-weight: 700; color: #374151;}
+        .form-grupo input { width: 100%; padding: 14px; border: 1px solid #d1d5db; border-radius: 10px; box-sizing: border-box; font-family: 'Inter'; font-size: 1rem; transition: border-color 0.2s; background: #f9fafb;}
+        .form-grupo input:focus { outline: none; border-color: #111827; background: white;}
+        
+        .grid-horarios { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .btn-hora { background: white; border: 1px solid #d1d5db; padding: 12px 0; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.95rem; color: #374151;}
+        .btn-hora:hover:not(.ocupada) { border-color: var(--accent); }
+        .btn-hora.seleccionada { background: var(--accent); color: white; border-color: var(--accent); }
+        .btn-hora.libre { background: #ecfdf5; border-color: #86efac; color: #166534; }
+        .btn-hora.libre:hover { border-color: #16a34a; }
+        .btn-hora.seleccionada { background: var(--accent); color: white; border-color: var(--accent); }
+        .btn-hora.noalcanza { background: #f3f4f6; border-color: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
+        .leyenda { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.8rem; color: #4b5563; margin: 4px 0 10px; }
+        .leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+        .leyenda i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; border: 1px solid; }
+        .btn-hora.ocupada { background: #fee2e2; border-color: #fca5a5; color: #ef4444; cursor: not-allowed; text-decoration: line-through; opacity: 0.7;}
+
+        .alerta-cerrado { display: none; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 12px; padding: 16px; color: #DC2626; align-items: flex-start; gap: 12px; margin-top: 10px; }
+        .alerta-cerrado-activa { display: flex; }
+        .alerta-cerrado svg { flex-shrink: 0; margin-top: 2px; }
+        .alerta-titulo { margin: 0 0 4px 0; font-size: 1.05rem; font-weight: 800; color: #B91C1C; }
+        .alerta-texto { margin: 0; font-size: 0.9rem; color: #991B1B; line-height: 1.4; }
+
+        .btn-submit { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 15px; font-size: 1.05rem; transition: background 0.3s;}
+        .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
+        
+        .btn-volver { display: block; width: 100%; text-align: center; background: none; border: none; color: #6b7280; margin-top: 20px; cursor: pointer; font-weight: 800; font-size: 1rem; }
+        
+        .exito-text { text-align: center; font-size: 1.4rem; font-weight: 800; margin: 15px 0; color: #111827;}
+        .ticket-box { background: #f3f4f6; padding: 15px; border-radius: 12px; text-align: center; font-size: 1.8rem; font-weight: 800; color: #1a73e8; margin-bottom: 20px; border: 2px dashed #cbd5e1; }
+        .btn-whatsapp { background: #25D366; color: white; width: 100%; border: none; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 1.1rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; text-decoration: none; box-sizing: border-box; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.2);}
+    </style>
+</head>
+<body>
+
+    <div class="contenedor-principal">
+        <header class="header-barberia">
+            <h1 id="ui-nombre-barberia">Barbería Sistema</h1>
+            <p id="ui-slogan-barberia">Ubicados en el centro de Huehuetenango.</p>
+
+            <div class="redes-sociales" id="ui-redes">
+                <a href="#" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+                <a href="#" target="_blank"><svg viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg></a>
+                <a href="#" target="_blank"><svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.245 3.481 5.228 3.481 8.411-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.306 1.657zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg></a>
+            </div>
+        </header>
+
+        <h2 class="seccion-titulo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
+            Servicios Clásicos
+        </h2>
+        <div id="grid-servicios"></div>
+
+        <h2 class="seccion-titulo" style="margin-top: 40px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Extras
+        </h2>
+        <div id="grid-extras"></div>
+    </div>
+
+    <!-- MODAL RESERVA -->
+    <div id="modal-reserva" class="modal-overlay">
+        <div class="modal-box">
+            <h2 id="titulo-modal" style="margin-top:0; font-weight: 800; font-size: 1.5rem; color: #111827;">Reservar</h2>
+            <form id="form-reserva">
+                <input type="hidden" id="servicio-id-modal">
+                <input type="hidden" id="hora-seleccionada" required>
+                
+                <div class="form-grupo"><label>Nombre Completo</label><input type="text" id="nombre" required maxlength="60" autocomplete="name" placeholder="Ej. Juan Pérez"></div>
+                <div class="form-grupo"><label>Teléfono (WhatsApp)</label><input type="tel" id="telefono" required inputmode="numeric" maxlength="11" autocomplete="tel" placeholder="Ej. 45551234"></div>
+                <div class="form-grupo"><label>¿Qué día quieres venir?</label><input type="date" id="fecha" required></div>
+                
+                <div id="contenedor-horarios" style="display: none; margin-bottom: 20px;">
+                    <div id="alerta-domingo" class="alerta-cerrado">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <div>
+                            <h4 class="alerta-titulo">Barbería Cerrada</h4>
+                            <p class="alerta-texto">La barbería no atiende en este día de la semana. Por favor selecciona otro día en el calendario.</p>
+                        </div>
+                    </div>
+
+                    <div id="seccion-cuadricula">
+                        <label style="font-weight: 700; font-size: 0.95rem; margin-bottom: 8px; display:block; color: #374151;">Horarios Disponibles</label>
+                        <div class="leyenda">
+                            <span><i style="background:#ecfdf5;border-color:#86efac"></i> Libre</span>
+                            <span><i style="background:#fee2e2;border-color:#fca5a5"></i> Ocupado</span>
+                            <span><i style="background:#f3f4f6;border-color:#e5e7eb"></i> No alcanza para tu servicio</span>
+                        </div>
+                        <div id="grid-horarios" class="grid-horarios"></div>
+                    </div>
+                </div>
+
+                <p style="font-size: 0.85rem; color: var(--text-sec); text-align: center; margin-bottom: 15px; font-weight: 500;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: text-top; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    Estos datos serán enviados directamente al barbero.
+                </p>
+
+                <button type="submit" class="btn-submit" id="btn-confirmar" disabled>Confirmar Cita</button>
+                <button type="button" class="btn-volver" onclick="cerrarModal()">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL ALERTA -->
+    <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
+        <div class="modal-box" style="text-align: center; max-width: 320px;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" style="margin-bottom: 15px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <h3 id="texto-alerta" style="margin-top: 0; margin-bottom: 20px; font-weight: 800; font-size: 1.1rem; color: #111827;">Mensaje</h3>
+            <button onclick="cerrarAlerta()" class="btn-submit" style="margin-top: 0;">Entendido</button>
+        </div>
+    </div>
+
+    <!-- MODAL ÉXITO -->
+    <div id="modal-exito" class="modal-overlay">
+        <div class="modal-box" style="text-align: center;">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2.5" style="margin-bottom: 10px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <div class="exito-text">Servicio Agendado.<br>Te Esperamos.</div>
+            <p style="color: var(--text-sec); font-size: 0.95rem; margin-bottom: 8px; font-weight: 600;">Presenta este ticket al barbero:</p>
+            <div id="ticket-texto" class="ticket-box">#CITA-00</div>
+            <a href="#" id="link-whatsapp" target="_blank" class="btn-whatsapp">Avisar al Barbero</a>
+            <button onclick="cerrarModalExito()" class="btn-volver">Volver al inicio</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0"></script>
+    <script src="app.js"></script>
+</body>
+</html>
